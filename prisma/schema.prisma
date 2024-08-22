@@ -1,0 +1,78 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  username  String    @db.VarChar(255)
+  email     String    @unique @db.VarChar(255)
+  password  String    @unique
+  boards    Board[]
+  comments  Comment[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("users")
+}
+
+model Board {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(255)
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  columns   Column[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@map("boards")
+}
+
+model Column {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(255)
+  boardId   Int
+  board     Board    @relation(fields: [boardId], references: [id])
+  cards     Card[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("columns")
+}
+
+model Card {
+  id          Int       @id @default(autoincrement())
+  title       String    @db.VarChar(255)
+  description String?
+  columnId    Int
+  column      Column    @relation(fields: [columnId], references: [id])
+  comments    Comment[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("cards")
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  message   String   @db.Text
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  card      Card     @relation(fields: [cardId], references: [id])
+  cardId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("comments")
+}
