@@ -8,7 +8,7 @@ export class SystemLogger implements LoggerService {
   private readonly logger = createLogger({
     format: format.combine(
       format.label({
-        label: `[${this.configService.getOrThrow<string>('APP_NAME')}}]`,
+        label: `[${this.configService.getOrThrow<string>('APP_NAME')}]`,
       }),
       format.timestamp(),
       format.splat()
